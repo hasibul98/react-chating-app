@@ -44,13 +44,24 @@ const LoginForm = () => {
     setError("");
     try {
       if (isSignUp) {
-        await createUserWithEmailAndPassword(auth, email, password);
-      } else {
-        signInWithEmailAndPassword(auth, email, password).then(
-          (userCredential) => {
-            navigate("/");
-          }
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
         );
+        // Sign out the user after signup so they can login manually
+        await signOut(auth);
+        setIsSignUp(false); // Switch to login form
+        setEmail("");
+        setPassword("");
+        setError("Account created successfully. Please login.");
+      } else {
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        navigate("/");
       }
     } catch (err) {
       setError(err.message);
